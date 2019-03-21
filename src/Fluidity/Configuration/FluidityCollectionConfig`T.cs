@@ -1,10 +1,13 @@
 // <copyright file="FluidityCollectionConfig`T.cs" company="Matt Brailsford">
-// Copyright (c) 2017 Matt Brailsford and contributors.
+// Copyright (c) 2019 Matt Brailsford and contributors.
 // Licensed under the Apache License, Version 2.0.
 // </copyright>
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
+using Fluidity.Actions;
 using Fluidity.Data;
 using Umbraco.Core;
 using Umbraco.Web.Models.Trees;
@@ -107,7 +110,7 @@ namespace Fluidity.Configuration
         /// <returns>The collection configuration.</returns>
         public FluidityCollectionConfig<TEntityType> SetConnectionString(string connectionStringName)
         {
-            _connectionStringg = connectionStringName;
+            _connectionString = connectionStringName;
             return this;
         }
 
@@ -184,6 +187,17 @@ namespace Fluidity.Configuration
         }
 
         /// <summary>
+        /// Sets a filter for the collection.
+        /// </summary>
+        /// <param name="filterExpression">The filter where clause expression.</param>
+        /// <returns>The collection configuration.</returns>
+        public FluidityCollectionConfig<TEntityType> SetFilter(Expression<Func<TEntityType, bool>> whereClause)
+        {
+            _filterExpression = whereClause;
+            return this;
+        }
+
+        /// <summary>
         /// Shows the collection on the section dashboard.
         /// </summary>
         /// <returns>The collection configuration.</returns>
@@ -208,8 +222,45 @@ namespace Fluidity.Configuration
         /// </summary>
         /// <returns>The collection configuration.</returns>
         public FluidityCollectionConfig<TEntityType> MakeReadOnly()
+        {                        
+            DisableCreate();
+            DisableUpdate();
+            DisableDelete();
+            return this;
+        }
+
+        /// <summary>
+        /// Disable creating entities in collection.
+        /// </summary>
+        /// <returns>The collection configuration.</returns>
+        public FluidityCollectionConfig<TEntityType> DisableCreate()
         {
-            _isReadOnly = true;
+            _canCreate = false;
+            return this;
+        }
+
+        /// <summary>
+        /// Disable updating entities in collection.
+        /// </summary>
+        /// <returns>The collection configuration.</returns>
+        public FluidityCollectionConfig<TEntityType> DisableUpdate()
+        {
+            _canUpdate = false;
+            return this;
+        }
+
+        /// <summary>
+        /// Disable deleting entities in collection.
+        /// </summary>
+        /// <returns>The collection configuration.</returns>
+        public FluidityCollectionConfig<TEntityType> DisableDelete()
+        {
+            _canDelete = false;        
+            if (_listView != null)
+            {
+                _listView.DefaultBulkActions.RemoveAll(x => x.GetType() == typeof(FluidityDeleteBulkAction));
+            }
+            
             return this;
         }
 
@@ -282,6 +333,17 @@ namespace Fluidity.Configuration
         }
 
         /// <summary>
+        /// Adds a property that will be encrypted / decrypted when retrived from the repository.
+        /// </summary>
+        /// <param name="encryptedPropertyExpression">The encrypted property expression.</param>
+        /// <returns>The collection configuration.</returns>
+        public FluidityCollectionConfig<TEntityType> AddEncryptedProperty(Expression<Func<TEntityType, string>> encryptedPropertyExpression)
+        {
+            _encryptedProperties.Add(encryptedPropertyExpression);
+            return this;
+        }
+
+        /// <summary>
         /// Sets which property to use as the Date Created property.
         /// </summary>
         /// <param name="dateCreatedPropertyExpression">The date created property expression.</param>
@@ -320,7 +382,12 @@ namespace Fluidity.Configuration
         /// <returns>The list view configuration.</returns>
         public new FluidityListViewConfig<TEntityType> ListView(FluidityListViewConfig<TEntityType> listViewConfig)
         {
-            _listView = listViewConfig;
+            if (_canDelete)
+            {
+                listViewConfig.DefaultBulkActions.Add(new FluidityDeleteBulkAction());
+            }
+
+            _listView = listViewConfig;                       
             return listViewConfig;
         }
 

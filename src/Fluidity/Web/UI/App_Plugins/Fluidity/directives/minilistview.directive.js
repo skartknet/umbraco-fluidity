@@ -1,5 +1,5 @@
 ﻿// <copyright file="minilistview.directive.js" company="Matt Brailsford">
-// Copyright (c) 2017 Matt Brailsford and contributors.
+// Copyright (c) 2019 Matt Brailsford and contributors.
 // Licensed under the Apache License, Version 2.0.
 // </copyright>
 
@@ -24,8 +24,8 @@
             $scope.options = angular.extend({}, {
                 pageNumber: 1,
                 pageSize: 10,
-                orderBy: "name",
-                orderDirection: "desc",
+				orderBy: $scope.opts.defaultOrderBy || "name",
+				orderDirection: $scope.opts.defaultOrderDirection || "desc",
                 filter: '', // Variable has to be named "filter" to work with list view properly
                 dataView: $scope.opts.dataView,
                 isSearchable: $scope.opts.isSearchable

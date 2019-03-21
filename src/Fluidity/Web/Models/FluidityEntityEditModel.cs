@@ -1,5 +1,5 @@
 ﻿// <copyright file="FluidityEntityEditModel.cs" company="Matt Brailsford">
-// Copyright (c) 2017 Matt Brailsford and contributors.
+// Copyright (c) 2019 Matt Brailsford and contributors.
 // Licensed under the Apache License, Version 2.0.
 // </copyright>
 
@@ -26,8 +26,8 @@ namespace Fluidity.Web.Models
         [DataMember(Name = "tree", IsRequired = true)]
         public string Tree { get; set; }
 
-        [DataMember(Name = "collectionIsReadOnly")]
-        public bool CollectionIsReadOnly { get; set; }
+        [DataMember(Name = "collectionIsEditable")]
+        public bool CollectionIsEditable { get; set; }
 
         [DataMember(Name = "collectionNameSingular")]
         public string CollectionNameSingular { get; set; }

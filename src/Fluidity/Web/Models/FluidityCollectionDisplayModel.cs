@@ -1,5 +1,5 @@
 ﻿// <copyright file="FluidityCollectionDisplayModel.cs" company="Matt Brailsford">
-// Copyright (c) 2017 Matt Brailsford and contributors.
+// Copyright (c) 2019 Matt Brailsford and contributors.
 // Licensed under the Apache License, Version 2.0.
 // </copyright>
 
@@ -34,11 +34,17 @@ namespace Fluidity.Web.Models
         [DataMember(Name = "description")]
         public string Description { get; set; }
 
-        [DataMember(Name = "isReadOnly")]
-        public bool IsReadOnly { get; set; }
-
         [DataMember(Name = "isSearchable")]
         public bool IsSearchable { get; set; }
+
+        [DataMember(Name = "canCreate")]
+        public bool CanCreate { get; set; }
+
+        [DataMember(Name = "canUpdate")]
+        public bool CanUpdate { get; set; }
+
+        [DataMember(Name = "canDelete")]
+        public bool CanDelete { get; set; }
 
         [DataMember(Name = "hasListView")]
         public bool HasListView { get; set; }

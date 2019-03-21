@@ -1,7 +1,7 @@
 ﻿// <copyright file="FluidityEntityPostValidator.cs" company="Umbraco, Matt Brailsford">
 // Original work Copyright (c) 2013 Umbraco and contributors.
 // Original work licensed under the MIT License (https://github.com/umbraco/Umbraco-CMS/blob/release-7.6.0/LICENSE.md).
-// Modified work Copyright (c) 2017 Matt Brailsford and contributors.
+// Modified work Copyright (c) 2019 Matt Brailsford and contributors.
 // Modified work licensed under the Apache License, Version 2.0.
 // </copyright>
 // <remarks>
@@ -34,12 +34,12 @@ namespace Fluidity.Web.WebApi.Validation
             : this(new UmbracoDataTypeHelper())
         { }
 
-        public void Validate(ModelStateDictionary modelState, FluidityEntityPostModel postModel, object entity, FluidityCollectionConfig config)
+        public void Validate(ModelStateDictionary modelState, FluidityEntityPostModel postModel, object entity, FluidityCollectionConfig config, bool isReadOnly)
         {
             var configProps = config.Editor?.Tabs.SelectMany(x => x.Fields).ToArray() ?? new FluidityEditorFieldConfig[0];
 
             if (ValidateProperties(modelState, postModel, configProps) == false) return;
-            if (ValidatePropertyData(modelState, postModel, configProps) == false) return;
+            if (ValidatePropertyData(modelState, postModel, configProps, isReadOnly) == false) return;
             if (ValidateDataAnnotations(modelState, entity) == false) return;
         }
 
@@ -56,11 +56,11 @@ namespace Fluidity.Web.WebApi.Validation
             return true;
         }
 
-        protected virtual bool ValidatePropertyData(ModelStateDictionary modelState, FluidityEntityPostModel postModel, FluidityEditorFieldConfig[] configProps)
+        protected virtual bool ValidatePropertyData(ModelStateDictionary modelState, FluidityEntityPostModel postModel, FluidityEditorFieldConfig[] configProps, bool isReadOnly)
         {
             foreach (var p in configProps)
             {
-                var dataTypeInfo = _dataTypeHelper.ResolveDataType(p);
+                var dataTypeInfo = _dataTypeHelper.ResolveDataType(p, isReadOnly);
                 var postedValue = postModel.Properties.Single(x => x.Alias == p.Property.Name).Value;
 
                 // Validate against the prop editor validators

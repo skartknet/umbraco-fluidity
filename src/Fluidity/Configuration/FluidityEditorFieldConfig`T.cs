@@ -1,5 +1,5 @@
-// <copyright file="FluidityEditorFieldConfig`T.cs" company="Matt Brailsford">
-// Copyright (c) 2017 Matt Brailsford and contributors.
+﻿// <copyright file="FluidityEditorFieldConfig`T.cs" company="Matt Brailsford">
+// Copyright (c) 2019 Matt Brailsford and contributors.
 // Licensed under the Apache License, Version 2.0.
 // </copyright>
 
@@ -28,7 +28,7 @@ namespace Fluidity.Configuration
         {
             config?.Invoke(this);
         }
-
+        
         /// <summary>
         /// Changes the label of the field.
         /// </summary>
@@ -160,10 +160,10 @@ namespace Fluidity.Configuration
         /// Makes the the field readonly, disabling editing in the UI.
         /// </summary>
         /// <returns>The editor field configuration.</returns>
-        public FluidityEditorFieldConfig<TEntityType, TValueType> MakeReadonly()
+        public FluidityEditorFieldConfig<TEntityType, TValueType> MakeReadOnly()
         {
             //TODO: Create defaults for different primitives
-            return MakeReadonly(type => type?.ToString());
+            return MakeReadOnly(type => type?.ToString());
         }
 
         /// <summary>
@@ -171,11 +171,27 @@ namespace Fluidity.Configuration
         /// </summary>
         /// <param name="format">A format function.</param>
         /// <returns>The editor field configuration.</returns>
-        public FluidityEditorFieldConfig<TEntityType, TValueType> MakeReadonly(Func<TValueType, string> format) {
+        public FluidityEditorFieldConfig<TEntityType, TValueType> MakeReadOnly(Func<TValueType, string> format) {
             _valueMapper = new ReadOnlyValueMapper(value => format((TValueType)value));
             _dataTypeId = -92;
-	        _isReadOnly = true;
+            _isReadOnly = true;
             return this;
         }
+
+        #region Obsoletes
+
+        [Obsolete("Inconsistent casing, use MakeReadOnly instead")]
+        public FluidityEditorFieldConfig<TEntityType, TValueType> MakeReadonly()
+        {
+            return MakeReadOnly();
+        }
+
+        [Obsolete("Inconsistent casing, use MakeReadOnly instead")]
+        public FluidityEditorFieldConfig<TEntityType, TValueType> MakeReadonly(Func<TValueType, string> format)
+        {
+            return MakeReadOnly(format);
+        }
+
+        #endregion
     }
 }

@@ -1,5 +1,5 @@
 // <copyright file="FluidityCollectionConfig.cs" company="Matt Brailsford">
-// Copyright (c) 2017 Matt Brailsford and contributors.
+// Copyright (c) 2019 Matt Brailsford and contributors.
 // Licensed under the Apache License, Version 2.0.
 // </copyright>
 
@@ -41,8 +41,8 @@ namespace Fluidity.Configuration
         protected string _description;
         internal string Description => _description;
 
-        protected string _connectionStringg;
-        internal string ConnectionString => _connectionStringg;
+        protected string _connectionString;
+        internal string ConnectionString => _connectionString;
 
         protected Type _entityType;
         internal Type EntityType => _entityType;
@@ -56,8 +56,14 @@ namespace Fluidity.Configuration
         protected bool _isVisibleInTree;
         internal bool IsVisibleInTree => _isVisibleInTree;
 
-        protected bool _isReadOnly;
-        internal bool IsReadOnly => _isReadOnly;
+        protected bool _canCreate;
+        internal bool CanCreate => _canCreate;
+
+        protected bool _canUpdate;
+        internal bool CanUpdate => _canUpdate;
+
+        protected bool _canDelete;
+        internal bool CanDelete => _canDelete;
 
         protected FluidityViewMode _viewMode;
         internal FluidityViewMode ViewMode => _viewMode;
@@ -92,6 +98,12 @@ namespace Fluidity.Configuration
         protected List<FluidityPropertyConfig> _searchableProperties;
         internal IEnumerable<FluidityPropertyConfig> SearchableProperties => _searchableProperties;
 
+        protected List<FluidityPropertyConfig> _encryptedProperties;
+        internal IEnumerable<FluidityPropertyConfig> EncryptedProperties => _encryptedProperties;
+
+        protected LambdaExpression _filterExpression;
+        internal LambdaExpression FilterExpression => _filterExpression;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="FluidityCollectionConfig"/> class.
         /// </summary>
@@ -113,10 +125,14 @@ namespace Fluidity.Configuration
             _iconSingular = iconSingular ?? "icon-folder";
             _iconPlural = iconPlural ?? "icon-folder";
             _isVisibleInTree = true;
+            _canCreate = true;
+            _canUpdate = true;
+            _canDelete = true;
 
             _containerMenuItems = new List<MenuItem>();
             _entityMenuItems = new List<MenuItem>();
             _searchableProperties = new List<FluidityPropertyConfig>();
+            _encryptedProperties = new List<FluidityPropertyConfig>();
         }
     }
 }

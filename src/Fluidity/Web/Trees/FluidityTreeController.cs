@@ -1,5 +1,5 @@
 ﻿// <copyright file="FluidityTreeController.cs" company="Matt Brailsford">
-// Copyright (c) 2017 Matt Brailsford and contributors.
+// Copyright (c) 2019 Matt Brailsford and contributors.
 // Licensed under the Apache License, Version 2.0.
 // </copyright>
 
@@ -199,7 +199,7 @@ namespace Fluidity.Web.Trees
                         hasMenuItems = true;
                     }
 
-                    if (!currentCollectionConfig.IsReadOnly)
+                    if (currentCollectionConfig.CanDelete)
                     {
                         // We create a custom item as we need to direct all fluidity delete commands to the
                         // same view, where as the in built delete dialog looks for seperate views per tree
@@ -213,7 +213,7 @@ namespace Fluidity.Web.Trees
                 {
                     var hasMenuItems = false;
 
-                    if (!currentCollectionConfig.IsReadOnly)
+                    if (currentCollectionConfig.CanCreate)
                     {
                         // We create a custom item as we need to direct all fluidity create commands to the
                         // same view, where as the in built create dialog looks for seperate views per tree
@@ -272,6 +272,11 @@ namespace Fluidity.Web.Trees
 
             node.Path = collection.Path + FluidityConstants.PATH_SEPERATOR + compositeId;
             node.AdditionalData.AddOrUpdate("entityId", itemId);
+            node.AdditionalData.AddOrUpdate("collectionAlias", collection.Alias);
+            node.AdditionalData.AddOrUpdate("sectionAlias", SectionAlias);
+            node.AdditionalData.AddOrUpdate("dashboardRoute", collection.ViewMode == FluidityViewMode.Tree
+                ? SectionAlias // Tree mode so just show the default dashboard
+                : SectionAlias + "/fluidity/list/" + collection.Alias); // List view so show the list
 
             return node;
         }

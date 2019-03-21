@@ -1,5 +1,5 @@
 ﻿// <copyright file="delete.controller.js" company="Matt Brailsford">
-// Copyright (c) 2017 Matt Brailsford and contributors.
+// Copyright (c) 2019 Matt Brailsford and contributors.
 // Licensed under the Apache License, Version 2.0.
 // </copyright>
 
@@ -15,18 +15,18 @@
             $scope.currentNode.loading = true;
 
             // Perform the delete
-            fluidityResource.deleteEntity($scope.currentNode.section,
-                $scope.currentNode.parentId,
+            fluidityResource.deleteEntity($scope.currentNode.metaData.sectionAlias,
+                $scope.currentNode.metaData.collectionAlias,
                 $scope.currentNode.metaData.entityId).then(function () {
 
                 // Remove the current node from the tree
                 treeService.removeNode($scope.currentNode);
 
                 // If the current edited item is the same one as we're deleting, we need to navigate elsewhere
-                if (editorState.current && editorState.current.id == $scope.currentNode.id) {
+                if (editorState.current && editorState.current.path == $scope.currentNode.path) {
 
                     // Just navigate to the section dashboard
-                    $location.path("/" + $scope.currentNode.metaData.application);
+                    $location.path("/" + $scope.currentNode.metaData.dashboardRoute);
 
                 }
 

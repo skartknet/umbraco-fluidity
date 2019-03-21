@@ -1,5 +1,5 @@
 ﻿// <copyright file="FluidityRepository`T.cs" company="Matt Brailsford">
-// Copyright (c) 2017 Matt Brailsford and contributors.
+// Copyright (c) 2019 Matt Brailsford and contributors.
 // Licensed under the Apache License, Version 2.0.
 // </copyright>
 
@@ -107,6 +107,8 @@ namespace Fluidity.Data
 
             if (fireEvents)
             {
+                args.Entity.After = entity;
+
                 Fluidity.OnSavedEntity(args);
 
                 entity = (TEntity)args.Entity.After;
@@ -206,5 +208,10 @@ namespace Fluidity.Data
         }
 
         #endregion
+
+        public virtual void Dispose()
+        {
+            //No resources to dispose of by default
+        }
     }
 }

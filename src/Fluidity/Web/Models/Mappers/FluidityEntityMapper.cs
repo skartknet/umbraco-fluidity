@@ -1,5 +1,5 @@
 ﻿// <copyright file="FluidityEntityMapper.cs" company="Matt Brailsford">
-// Copyright (c) 2017 Matt Brailsford and contributors.
+// Copyright (c) 2019 Matt Brailsford and contributors.
 // Licensed under the Apache License, Version 2.0.
 // </copyright>
 
@@ -45,7 +45,8 @@ namespace Fluidity.Web.Models.Mappers
             var name = "";
             if (collection.NameProperty != null)
             {
-                name = entity.GetPropertyValue(collection.NameProperty).ToString();
+                var nameValue = entity.GetPropertyValue(collection.NameProperty);
+                name = nameValue == null ? null : nameValue.ToString();
             }
             else if (collection.NameFormat != null)
             {
@@ -76,6 +77,12 @@ namespace Fluidity.Web.Models.Mappers
                 foreach (var field in collection.ListView.Fields)
                 {
                     var value = entity?.GetPropertyValue(field.Property);
+
+                    var encryptedProp = collection.EncryptedProperties?.FirstOrDefault(x => x.Name == field.Property.Name);
+                    if (encryptedProp != null)
+                    {
+                        value = SecurityHelper.Decrypt(value.ToString());
+                    }
 
                     if (field.Format != null)
                     {
@@ -113,7 +120,7 @@ namespace Fluidity.Web.Models.Mappers
                 HasNameProperty = collection.NameProperty != null,
                 Section = section.Alias,
                 Tree = section.Tree.Alias,
-                CollectionIsReadOnly = collection.IsReadOnly,
+                CollectionIsEditable = isNew && collection.CanCreate || !isNew && collection.CanUpdate,
                 Collection = collection.Alias,
                 CollectionNameSingular = collection.NameSingular,
                 CollectionNamePlural = collection.NamePlural,
@@ -144,8 +151,8 @@ namespace Fluidity.Web.Models.Mappers
                     if (tab.Fields != null)
                     {
                         foreach (var field in tab.Fields)
-                        {
-                            var dataTypeInfo = _dataTypeHelper.ResolveDataType(field);
+                        {                            
+                            var dataTypeInfo = _dataTypeHelper.ResolveDataType(field, !display.CollectionIsEditable);
 
                             dataTypeInfo.PropertyEditor.ValueEditor.ConfigureForDisplay(dataTypeInfo.PreValues);
 
@@ -156,6 +163,12 @@ namespace Fluidity.Web.Models.Mappers
                             object value = !isNew
                                 ? entity?.GetPropertyValue(field.Property)
                                 : field.DefaultValueFunc != null ? field.DefaultValueFunc() : field.Property.Type.GetDefaultValue();
+
+                            var encryptedProp = collection.EncryptedProperties?.FirstOrDefault(x => x.Name == field.Property.Name);
+                            if (encryptedProp != null)
+                            {
+                                value = SecurityHelper.Decrypt(value.ToString());
+                            }
 
                             if (field.ValueMapper != null)
                             {
@@ -219,7 +232,7 @@ namespace Fluidity.Web.Models.Mappers
             return display;
         }
 
-        public object FromPostModel(FluiditySectionConfig section, FluidityCollectionConfig collection, FluidityEntityPostModel postModel, object entity)
+        public object FromPostModel(FluiditySectionConfig section, FluidityCollectionConfig collection, FluidityEntityPostModel postModel, object entity, bool isReadOnly)
         {
             var editorProps = collection.Editor.Tabs.SelectMany(x => x.Fields).ToArray();
 
@@ -259,11 +272,18 @@ namespace Fluidity.Web.Models.Mappers
                     additionalData.Add("cuid", ObjectExtensions.EncodeAsGuid(cuid));
                     additionalData.Add("puid", ObjectExtensions.EncodeAsGuid(puid));
 
-                    var dataTypeInfo = _dataTypeHelper.ResolveDataType(propConfig);
+                    var dataTypeInfo = _dataTypeHelper.ResolveDataType(propConfig, isReadOnly);
                     var data = new ContentPropertyData(prop.Value, dataTypeInfo.PreValues, additionalData);
 
                     if (!dataTypeInfo.PropertyEditor.ValueEditor.IsReadOnly) {
                         var currentValue = entity.GetPropertyValue(propConfig.Property);
+
+                        var encryptedProp = collection.EncryptedProperties?.FirstOrDefault(x => x.Name == propConfig.Property.Name);
+                        if (encryptedProp != null)
+                        {
+                            currentValue = SecurityHelper.Decrypt(currentValue.ToString());
+                        }
+
                         if (propConfig.ValueMapper != null) {
                             currentValue = propConfig.ValueMapper.ModelToEditor(currentValue);
                         }
@@ -280,6 +300,11 @@ namespace Fluidity.Web.Models.Mappers
                         if (propConfig.ValueMapper != null)
                         {
                             propVal = propConfig.ValueMapper.EditorToModel(propVal);
+                        }
+
+                        if (encryptedProp != null)
+                        {
+                            propVal = SecurityHelper.Encrypt(propVal.ToString());
                         }
 
                         if (propVal != null && propVal.GetType() != propConfig.Property.Type) {

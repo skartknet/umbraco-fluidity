@@ -1,5 +1,5 @@
 ﻿// <copyright file="entitypicker.controller.js" company="Matt Brailsford">
-// Copyright (c) 2017 Matt Brailsford and contributors.
+// Copyright (c) 2019 Matt Brailsford and contributors.
 // Licensed under the Apache License, Version 2.0.
 // </copyright>
 
@@ -16,7 +16,9 @@
         $scope.listView = {
             options: {
                 dataView: dialogOptions.dataView,
-                isSearchable: false
+				isSearchable: false,
+				defaultOrderBy: "Name",
+                defaultOrderDirection: "desc"
             },
             getItems: function (id, options) {
                 return fluidityResource.getEntities(dialogOptions.section, dialogOptions.collection, options).then(function (data) {
@@ -50,7 +52,9 @@
         }
 
         function init(collection) {
-            $scope.listView.options.isSearchable = collection.isSearchable;
+			$scope.listView.options.isSearchable = collection.isSearchable;
+			$scope.listView.options.defaultOrderBy = collection.listView.defaultOrderBy;
+			$scope.listView.options.defaultOrderDirection = collection.listView.defaultOrderDirection;
             $scope.collection = collection;
         }
 

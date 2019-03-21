@@ -1,5 +1,5 @@
 ﻿// <copyright file="entitypicker.controller.js" company="Matt Brailsford">
-// Copyright (c) 2017 Matt Brailsford and contributors.
+// Copyright (c) 2019 Matt Brailsford and contributors.
 // Licensed under the Apache License, Version 2.0.
 // </copyright>
 
@@ -7,7 +7,7 @@
 
     'use strict';
 
-    function entityPickerController($scope, editorState, angularHelper, fluidityResource) {
+    function entityPickerController($scope, editorState, angularHelper, fluidityResource, $location) {
 
         var aliases = $scope.model.config.collection.split(',');
         var sectionAlias = aliases.length >= 1 ? aliases[0] : "";
@@ -15,7 +15,7 @@
         var dataView = aliases.length >= 3 ? aliases[2] : "";
 
         $scope.renderModel = [];
-        $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor;
+        $scope.dialogEditor = editorState && editorState.current && editorState.current.isDialogEditor;        
 
         // Sortable options
         $scope.sortableOptions = {
@@ -23,6 +23,12 @@
             tolerance: "pointer",
             scroll: true,
             zIndex: 6000
+        };
+
+        // Config options
+        $scope.configOptions = {
+            showOpen: $scope.model.config.showOpen.length ? $scope.model.config.showOpen : "0",
+            showRemove: $scope.model.config.showRemove.length ? $scope.model.config.showRemove : "1"
         };
 
         // Dialog options
@@ -82,6 +88,10 @@
         $scope.remove = function (index) {
             $scope.renderModel.splice(index, 1);
             angularHelper.getCurrentForm($scope).$setDirty();
+        };
+
+        $scope.open = function (section, collection, id) {
+            $location.path("/" + section + "/fluidity/edit/" + collection + "!" + id);
         };
 
         $scope.clear = function () {

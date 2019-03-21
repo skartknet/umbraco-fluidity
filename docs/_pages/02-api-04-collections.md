@@ -211,6 +211,34 @@ Adds the given property to the searchable properties collection. Property must b
 collectionConfig.AddSearchableProperty(p => p.FirstName);
 ````
 
+### Defining encrypted properties
+{: .mt}
+
+#### AddEncryptedProperty(Lambda encryptedPropertyExpression) *: FluidityCollectionConfig&lt;TEntityType&gt;*
+{: .signature}
+
+Adds the given property to the encrypted properties collection. Property must be of type `String`. When set, the property will be encrypted/decrypted on write/read respectively.
+
+````csharp
+// Example
+collectionConfig.AddEncryptedProperty(p => p.Email);
+````
+
+### Applying a global filter
+{: .mt}
+
+Sometimes you may only want to work with a sub-set of data within a given table so this is where the `SetFilter` method comes in handy, allowing you to define a global filter to apply to all queries for the given collection.
+
+#### SetFilter(Lambda whereClauseExression) *: FluidityCollectionConfig&lt;TEntityType&gt;*
+{: .signature}
+
+Sets the filter where clause expression. Expression must be a `boolean` expression.
+
+````csharp
+// Example
+collectionConfig.SetFilter(p => p.Current);
+````
+
 ### Defining menu items
 {: .mt}
 See [Menu Items API documentation]({{ site.baseurl }}/api/menu-items/) for more info.
@@ -289,13 +317,52 @@ Sets the collection as read only and disables any CRUD operations from being per
 collectionConfig.MakeReadOnly();
 ````
 
+### Disable the option to create
+{: .mt}
+
+#### DisableCreate() *: FluidityCollectionConfig&lt;TEntityType&gt;*
+{: .signature}
+
+Disables the option to create entities on the current collection. An entity could be created via code-behind and then only editing is allowed in the UI for example.
+
+````csharp
+// Example
+collectionConfig.DisableCreate();
+````
+
+### Disable the option to update
+{: .mt}
+
+#### DisableUpdate() *: FluidityCollectionConfig&lt;TEntityType&gt;*
+{: .signature}
+
+Disables the option to update entities on the current collection. An entity can be created, but further editing is not allowed. 
+
+````csharp
+// Example
+collectionConfig.DisableUpdate();
+````
+
+### Disable the option to delete
+{: .mt}
+
+#### DisableDelete() *: FluidityCollectionConfig&lt;TEntityType&gt;*
+{: .signature}
+
+Disables the option to delete entities on the current collection. Useful if the data needs to be retained and visible. See also [defining a deleted flag](#defining-a-deleted-flag).
+
+````csharp
+// Example
+collectionConfig.DisableDelete();
+````
+
 ### Setting a view mode
 {: .mt}
 
 #### SetViewMode(FluidityViewMode viewMode) *: FluidityCollectionConfig&lt;TEntityType&gt;*
 {: .signature}
 
-Sets the view mode of the current collection. Opions are `Tree` or `List`. When set to `Tree` then all entities will appear as nodes in the tree. When set as `List` then entities will be hidden from the tree and show in a [list view]({{ site.baseurl }}/api/collections/list-view/) in the right hand content area.
+Sets the view mode of the current collection. Options are `Tree` or `List`. When set to `Tree` then all entities will appear as nodes in the tree. When set as `List` then entities will be hidden from the tree and show in a [list view]({{ site.baseurl }}/api/collections/list-view/) in the right hand content area.
 
 ````csharp
 // Example
